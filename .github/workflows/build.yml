@@ -9,7 +9,7 @@ on:
   release:
     types:
       - created
-  workflow_dispatch:  # Para acionar manualmente
+  workflow_dispatch:
 
 jobs:
   build:
@@ -38,14 +38,26 @@ jobs:
             echo "${{ github.ref_name }}" > docker_tag.txt
           fi
 
-      - name: Build and push Docker image
+      - name: Build Docker image
+        id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: .
-          push: true
-          tags: |
-            mentordosnerds/google-calendar-sync:$(cat docker_tag.txt)
-            $(if [ -f latest.txt ]; then echo "mentordosnerds/google-calendar-sync:latest"; fi)
+          push: false
+          outputs: type=docker,dest=/tmp/docker-image.tar
+          tags: mentordosnerds/google-calendar-sync:${{ github.sha }}
+
+      - name: Load Docker image
+        run: docker load --input /tmp/docker-image.tar
+
+      - name: Tag and push Docker image
+        run: |
+          docker tag mentordosnerds/google-calendar-sync:${{ github.sha }} mentordosnerds/google-calendar-sync:$(cat docker_tag.txt)
+          docker push mentordosnerds/google-calendar-sync:$(cat docker_tag.txt)
+          if [ -f latest.txt ]; then
+            docker tag mentordosnerds/google-calendar-sync:${{ github.sha }} mentordosnerds/google-calendar-sync:latest
+            docker push mentordosnerds/google-calendar-sync:latest
+          fi
 
       - name: Upload Docker tag as artifact
         uses: actions/upload-artifact@v2
