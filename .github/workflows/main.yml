@@ -2,11 +2,13 @@ name: Sync Google Calendars
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - '*'
     tags:
       - '*'
   #schedule:
   #  - cron: '*/20 * * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,7 +20,7 @@ jobs:
 
       - name: Get max semver tag
         id: get_max_semver_tag
-        if: github.ref != 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/tags/')
         uses: dorny/sort-semver@v1
         with:
           extract-version: 'refs/tags/(.*)'
@@ -48,9 +50,9 @@ jobs:
           push: true
           tags: mentordosnerds/google-calendar-sync:${{ steps.docker_tag.outputs.tag }}
 
-  sync:
+  deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Run Docker image
