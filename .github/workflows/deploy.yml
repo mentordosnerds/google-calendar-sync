@@ -1,0 +1,33 @@
+name: Deploy Docker Image
+
+on:
+  workflow_run:
+    workflows: ["Build Docker Image"]
+    types:
+      - completed
+  #schedule:
+  #  - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'workflow_dispatch' || github.event_name == 'schedule'
+
+    steps:
+      - name: Download Docker tag artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-tag
+
+      - name: Run Docker image
+        run: |
+          docker_tag=$(cat docker_tag.txt)
+          docker run --rm \
+            -e EMAIL_SOURCE="${{ secrets.EMAIL_SOURCE }}" \
+            -e EMAIL_TARGET="${{ secrets.EMAIL_TARGET }}" \
+            -e SOURCE_CALENDAR_ID="${{ secrets.SOURCE_CALENDAR_ID }}" \
+            -e TARGET_CALENDAR_ID="${{ secrets.TARGET_CALENDAR_ID }}" \
+            -e SOURCE_SERVICE_ACCOUNT_KEY="${{ secrets.SOURCE_SERVICE_ACCOUNT_KEY }}" \
+            -e TARGET_SERVICE_ACCOUNT_KEY="${{ secrets.TARGET_SERVICE_ACCOUNT_KEY }}" \
+            mentordosnerds/google-calendar-sync:$docker_tag

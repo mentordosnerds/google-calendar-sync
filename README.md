@@ -63,7 +63,7 @@ Para configurar o GitHub Actions, você precisará adicionar as variáveis de am
 
 Você também precisará adicionar suas credenciais Docker Hub como secrets para que o GitHub Actions possa enviar a imagem Docker para o Docker Hub. Adicione `DOCKER_HUB_USERNAME` e `DOCKER_HUB_PASSWORD` como secrets.
 
-Finalmente, atualize o arquivo de configuração do GitHub Actions [.github/workflows/main.yml](.github/workflows/main.yml) com o nome do seu repositório Docker Hub.
+Finalmente, atualize os arquivos de configuração do GitHub Actions [.github/workflows](.github/workflows) com o nome do seu repositório Docker Hub.
 
 Com isso, o projeto está pronto para ser executado. O GitHub Actions irá construir e enviar a imagem Docker para o Docker Hub sempre que um push for feito na branch main ou quando uma tag for criada. Além disso, ele irá executar o script a cada 20 minutos para sincronizar os calendários.
 
