@@ -5,8 +5,8 @@ on:
     branches: [ main ]
     tags:
       - '*'
-  schedule:
-    - cron: '*/20 * * * *'
+  #schedule:
+  #  - cron: '*/20 * * * *'
 
 jobs:
   build:
@@ -36,7 +36,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: coisa/google-calendar-sync:${{ steps.docker_tag.outputs.tag }}
+          tags: mentordosnerds/google-calendar-sync:${{ steps.docker_tag.outputs.tag }}
 
   sync:
     runs-on: ubuntu-latest
@@ -52,4 +52,4 @@ jobs:
             -e TARGET_CALENDAR_ID="${{ secrets.TARGET_CALENDAR_ID }}" \
             -e SOURCE_SERVICE_ACCOUNT_KEY="${{ secrets.SOURCE_SERVICE_ACCOUNT_KEY }}" \
             -e TARGET_SERVICE_ACCOUNT_KEY="${{ secrets.TARGET_SERVICE_ACCOUNT_KEY }}" \
-            coisa/google-calendar-sync:latest
+            mentordosnerds/google-calendar-sync:latest
