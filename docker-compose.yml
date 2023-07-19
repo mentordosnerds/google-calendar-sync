@@ -1,0 +1,7 @@
+version: '3'
+services:
+  sync-calendar:
+    build: .
+    image: coisa/google-calendar-sync:latest
+    env_file:
+      - .env
