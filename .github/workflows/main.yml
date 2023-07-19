@@ -16,6 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Get max semver tag
+        id: get_max_semver_tag
+        if: github.ref != 'refs/heads/main'
+        uses: dorny/sort-semver@v1
+        with:
+          extract-version: 'refs/tags/(.*)'
+          include: '${{ github.ref }}'
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -26,7 +34,9 @@ jobs:
         id: docker_tag
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "::set-output name=tag::latest"
+            echo "::set-output name=tag::staging"
+          elif [[ "${{ github.ref }}" == "refs/tags/${{ steps.get_max_semver_tag.outputs.max }}" ]]; then
+            echo "::set-output name=tag::${{ github.ref_name }},latest"
           else
             echo "::set-output name=tag::${{ github.ref_name }}"
           fi
